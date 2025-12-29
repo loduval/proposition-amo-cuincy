@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC2 Consulting - Proposition AMO Cuincy</title>
+    <style>
+        :root {
+            --primary: #3A7A7A;
+            --primary-light: #4A8A8A;
+            --primary-dark: #2A6A6A;
+            --text: #2d2d2d;
+            --text-light: #666666;
+            --bg: #ffffff;
+            --bg-alt: #f8fafa;
+            --border: #e0e8e8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @media print {
+            .page { page-break-after: always; }
+            .page:last-child { page-break-after: auto; }
+            .no-print { display: none !important; }
+            .progress-bar { display: none !important; }
+            body { font-size: 11pt; }
+        }
+        
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: #f0f4f4;
+        }
+        
+        /* Barre de progression */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            z-index: 1000;
+            transition: width 0.3s ease;
+        }
+        
+        /* Navigation flottante */
+        .nav-float {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(58, 122, 122, 0.15);
+            padding: 12px;
+            z-index: 999;
+            max-height: 80vh;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: all 0.3s ease;
+        }
+        
+        .nav-float.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .nav-float a {
+            display: block;
+            padding: 8px 16px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-float a:hover {
+            background: var(--bg-alt);
+            color: var(--primary);
+            padding-left: 20px;
+        }
+        
+        .nav-float a.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .nav-toggle, .print-btn {
+            position: fixed;
+            top: 20px;
+            width: 44px;
+            height: 44px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(58, 122, 122, 0.3);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .nav-toggle {
+            right: 20px;
+        }
+        
+        .print-btn {
+            right: 74px;
+        }
+        
+        .nav-toggle:hover, .print-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Container des pages */
+        .document {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .page {
+            background: white;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            min-height: 297mm;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Page de couverture */
+        .cover {
+            background: var(--primary);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px;
+        }
+        
+        .cover::before {
+            display: none;
+        }
+        
+        .cover .logo {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: 12px;
+            margin-bottom: 60px;
+        }
+        
+        .cover h1 {
+            font-family: Georgia, serif;
+            font-size: 36px;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+        
+        .cover .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        
+        .cover .separator {
+            width: 120px;
+            height: 2px;
+            background: rgba(255,255,255,0.5);
+            margin: 0 auto 40px;
+        }
+        
+        .cover .type {
+            font-size: 14px;
+            letter-spacing: 3px;
+            opacity: 0.8;
+        }
+        
+        .cover .ref {
+            position: absolute;
+            bottom: 60px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+        
+        /* Pages de contenu */
+        .content-page {
+            padding: 50px;
+        }
+        
+        .content-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 8px;
+            height: 100%;
+            background: var(--primary);
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .page-header .logo-small {
+            height: 50px;
+            width: auto;
+        }
+        
+        .logo-img {
+            height: 80px;
+            width: auto;
+            margin-bottom: 20px;
+        }
+        
+        .logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 4px;
+        }
+        
+        .page-header .page-num {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        h2 {
+            font-family: Georgia, serif;
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-weight: 400;
+        }
+        
+        h3 {
+            font-size: 16px;
+            color: var(--primary);
+            margin: 25px 0 12px;
+            font-weight: 600;
+        }
+        
+        h4 {
+            font-size: 14px;
+            color: var(--primary-dark);
+            margin: 20px 0 10px;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        
+        ul {
+            margin: 12px 0 12px 20px;
+        }
+        
+        li {
+            margin-bottom: 6px;
+        }
+        
+        /* Tableaux avec effet hover */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+        
+        tr {
+            transition: all 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: var(--bg-alt);
+            transform: scale(1.005);
+            box-shadow: 0 2px 10px rgba(58, 122, 122, 0.1);
+        }
+        
+        tbody tr:hover td {
+            color: var(--primary-dark);
+        }
+        
+        .total-row {
+            background: var(--primary) !important;
+            color: white !important;
+            font-weight: 700;
+        }
+        
+        .total-row td {
+            color: white !important;
+            border: none;
+        }
+        
+        /* Encadrés */
+        .highlight-box {
+            background: var(--bg-alt);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .highlight-box:hover {
+            transform: translateX(5px);
+            box-shadow: -4px 0 0 var(--primary-light);
+        }
+        
+        /* Sommaire interactif */
+        .toc {
+            background: var(--bg-alt);
+            padding: 30px;
+            border-radius: 8px;
+        }
+        
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            margin: 4px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text);
+        }
+        
+        .toc-item:hover {
+            background: white;
+            padding-left: 24px;
+            color: var(--primary);
+            box-shadow: 0 2px 10px rgba(58, 122, 122, 0.1);
+        }
+        
+        .toc-item .num {
+            font-weight: 600;
+            color: var(--primary);
+            margin-right: 12px;
+        }
+        
+        .toc-item .dots {
+            flex: 1;
+            border-bottom: 1px dotted var(--border);
+            margin: 0 12px;
+        }
+        
+        .toc-item .page-ref {
+            color: var(--text-light);
+            font-size: 13px;
+        }
+        
+        /* Phases avec animation */
+        .phase-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .phase-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .phase-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(58, 122, 122, 0.15);
+        }
+        
+        .phase-card:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .phase-num {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .phase-title {
+            font-size: 20px;
+            color: var(--text);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        /* Signature */
+        .signature-box {
+            border: 2px solid var(--border);
+            padding: 40px;
+            margin-top: 40px;
+        }
+        
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .signature-zone {
+            padding: 20px;
+            border: 1px dashed var(--border);
+            min-height: 150px;
+        }
+        
+        .signature-zone h4 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        /* Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 50px;
+            right: 50px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+        
+        /* Animations d'entrée */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-in {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        /* Responsive */
+        @media screen and (max-width: 768px) {
+            .document {
+                padding: 10px;
+            }
+            .page {
+                min-height: auto;
+            }
+            .content-page {
+                padding: 30px;
+            }
+            .nav-float {
+                display: none;
+            }
+            .signature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barre de progression -->
+    <div class="progress-bar no-print" id="progressBar"></div>
+    
+    <!-- Bouton navigation -->
+    <button class="print-btn no-print" onclick="window.print()" title="Imprimer">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/>
+        </svg>
+    </button>
+    <button class="nav-toggle no-print" id="navToggle" onclick="toggleNav()">☰</button>
+    
+    <!-- Navigation flottante -->
+    <nav class="nav-float no-print" id="navFloat">
+        <a href="#cover">Couverture</a>
+        <a href="#sommaire">Sommaire</a>
+        <a href="#objet">1. Objet</a>
+        <a href="#contexte">2. Contexte</a>
+        <a href="#perimetre">3. Périmètre</a>
+        <a href="#demarche">4. Démarche</a>
+        <a href="#cctp">5. Contenu CCTP</a>
+        <a href="#organisation">6. Organisation</a>
+        <a href="#planning">7. Planning</a>
+        <a href="#financier">8. Proposition financière</a>
+        <a href="#conditions">9. Conditions</a>
+        <a href="#signature">10. Signature</a>
+        <a href="#annexes">Annexes</a>
+    </nav>
+    
+    <div class="document">
+        
+        <!-- PAGE 1 : COUVERTURE -->
+        <div class="page cover" id="cover">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACTCAMAAABbEhBjAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAI6UExURVWAgERzc0Vzc0RyclR/f+Do6P///zFkZDJlZTBkZENyct3l5TNmZjFlZTxvbz9ycj5xcTVoaJvOzrTl5bPm5rPl5ard3Ut+frLl5aDT03apqXirq5HExML19VGEhHmsrC1gYDBjY12QkL7x8XqtrV+Skr/y8kN2dmOWlnWoqHSmpjdqameamn2wsGGUlEl8fGWYmH6xsWCTkzlsbGqdnS9iYjRnZz1wcHGkpG+ionCjo06BgW2goEh7e26hoWaZmXeqqnuurlKFhUBzc1eKijhra0d6ek2AgFqNjXyvr1CDg1iLi0J1dUx/f0p9fXSnp1yPj4Czs1WIiHKlpWmcnEF0dEV4eDZpaZLFxY7BwUR3dztublSHh4m8vGyfn0Z5eWuenoe6ulaJiWibm3+ysoa5uYi7uzptbY/AwI3AwKja2qbZ2Yq9vXKkpE+Cgmyenm+hoa7h4cX09JPFxb7w8Mv+/s7//7/x8ZTHx4G0tMz//83//8T29pbJybjr69D//4S3t8///8H09K3g4Mr8/L3w8Lrt7bfq6qnc3MX394i6uo/CwrHk5NH//6ve3pzPz7ns7Mv9/XOmpq7f3y5hYcDz87Tn56PW1sz9/ZjLy4y/v6HU1Iu+voO2ts3+/sj6+mSXl1WJicv8/Ep+frzv78Dy8sT397vu7r7v78L09Mj7+7Dj48f6+lOGhrbp6cz+/p3Q0K3f38n8/Mb5+VmMjGiamoW3t7rr6056ejxsbD1tbTtsbE15ed/n5xefjWoAAAABYktHRAZhZrh9AAAAB3RJTUUH6QwdCAgcSNcFVgAABD1JREFUeNrt3P1/UlUcB/Cpte+3uvGwyinL4ZlbaIwYsnthQwbIGDAh3RKR+bCW2MzMogQLSmJSs9Qc9qCzJ631pD2XPfe/dYE9pD+wfkDOydf388N5ce8v9/26fO85514up6lpxUqxsuqOO5ubm1YAipW77r5HZa1ESazcu4pYxCIW/xDr9mRxG3FqslDSaHlEp8eaLE3Lffc3Pg+sboWaLN2atYa2Rsfw4Lr25VjG9azRWd+xYVlWJ2v4pce6HiIWsYhFLGIRi1jEIhaxiEUsYhGLWMQiFrGIRSxiEYtYxCIWsYhFLGIRi1jEIhaxiEUsYhGLWP8lN71nKgQLkaFerzZCsRBMGzcZjQ93aWHxuPxZaO62PGLValt7bJsX38zlzkK7odcuM0VhssPZt+DizUKpvwfQ1d/WtsUNyoBnvvJ5s6Ddq0g9vq1a/6CtAwKWIRCBhZIhKIcM5vILw5rwsLxtixgsnc8csERAiT4qQdQr6cIBFIAF1u0wZJBgx8jIKJh9Or1RKwQr+hiLOgGcnt6dTOmMSIaYEKxdBoz54mDdnRiDPWG72ecQgYX2sEPatJexfTaZde1n40ZFBJYEj3fIu0ZcMGHBJ2w6dqBLiCtRwljSz6xG98HwsDciu217xOhOJdgW1slx/YRFr5fHkq55C3cWYii5N84mLHIgNLIVBBkTy/Oaoe3G2ETYGu6LgDAzCDUgxcxPWia1/5qgisBSv0gIjQKKNTutnjG4YbMOrFvxjzbxWPXp5RF7Dz1VvxzyxrE+rM7DT9cvh4+Y68KSMG6uZ+JSfVhi1tatSaNZCEu3zgjqjUV1s/KRX3eK8ehwBOdR+qDnmQOuuHp4VI4++9xgYAnSaFYk9XyycoIQgi8cS2fSx19sBbS/dCybe/kV06KkwSwwnci/WmHB6JpCburEVK5w0s28xdxrr6czCV7PIMA0Xaiw0H+q8Mab7WPtp4spl+PM2beOus9lZsYXKLxYzFkqJRUGTHPeDbHE2/3yO8bMu0HOLNS35N+rlJJ6aaoVr7GD7kLhjJ/zl4iak/mWSiVhtYHJROmiD7mzUvnZ6i1hpYHJS6XcrIbX08BFlvn9fEpX7SjUTbB/UMq1xLj1W2XWhzIAMMtHHw+w8hB4+YqqOvLJxVkt4/bstMxKjLvdbv+n05m5Aa3Zsf+z457AvmLu1JVx91CAX23lPv9ibu7L3crOrwpXr11IfV2Y+WbH1Wx2nbp3enThSA1nfftdOpvNZr7XS5d/KObP5ourQ/LGH9Pp8t6ffubEwsDm691qrg+qte73/HL6YLcf0OTprqSHV78l4fzKCpUBSG2B4dJOxqvkb0be+EvPUv7Hs1NBV8841+dsdPouTS3D0qz9dYZDrgVrs5TYGI+Y4jXXsSlPOrik9qo/QoRYxCKWCCHWbcMSbr1TqKx3+tvvf4iVP//6u7n5H2Ns80zWc5lLAAAAAElFTkSuQmCC" alt="LC2" style="height: 150px; margin-bottom: 40px;">
+            <h1>PROPOSITION D'ACCOMPAGNEMENT</h1>
+            <p class="subtitle">Renouvellement et Sécurisation de l'Infogérance<br>Système d'Information de la Ville de Cuincy</p>
+            <p class="type">ASSISTANCE À MAÎTRISE D'OUVRAGE (AMO)<br>TECHNIQUE & ADMINISTRATIVE</p>
+            <p class="ref">Réf. AMO-SI-CUINCY-2025-01 | Janvier 2025</p>
+        </div>
+        
+        <!-- PAGE 2 : SOMMAIRE -->
+        <div class="page content-page" id="sommaire">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 2/14</span>
+            </div>
+            
+            <h2>Sommaire</h2>
+            
+            <div class="toc">
+                <a class="toc-item" href="#objet">
+                    <span><span class="num">1.</span> Objet de la mission</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">3</span>
+                </a>
+                <a class="toc-item" href="#contexte">
+                    <span><span class="num">2.</span> Contexte et enjeux</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">3</span>
+                </a>
+                <a class="toc-item" href="#perimetre">
+                    <span><span class="num">3.</span> Périmètre et hypothèses de dimensionnement</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">4</span>
+                </a>
+                <a class="toc-item" href="#demarche">
+                    <span><span class="num">4.</span> Démarche et livrables</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">5</span>
+                </a>
+                <a class="toc-item" href="#cctp">
+                    <span><span class="num">5.</span> Contenu technique recommandé pour le CCTP</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">7</span>
+                </a>
+                <a class="toc-item" href="#organisation">
+                    <span><span class="num">6.</span> Organisation, qualité et engagements</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">8</span>
+                </a>
+                <a class="toc-item" href="#planning">
+                    <span><span class="num">7.</span> Planning prévisionnel</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">9</span>
+                </a>
+                <a class="toc-item" href="#financier">
+                    <span><span class="num">8.</span> Proposition financière</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">10</span>
+                </a>
+                <a class="toc-item" href="#conditions">
+                    <span><span class="num">9.</span> Conditions générales et périmètre exclus</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">11</span>
+                </a>
+                <a class="toc-item" href="#signature">
+                    <span><span class="num">10.</span> Acceptation et signature</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">12</span>
+                </a>
+                <a class="toc-item" href="#annexes" style="margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px;">
+                    <span><span class="num">A.</span> Annexe – Fiche prestataire (LC2)</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">13</span>
+                </a>
+                <a class="toc-item" href="#annexe-b">
+                    <span><span class="num">B.</span> Annexe – Fiche client (Ville de Cuincy)</span>
+                    <span class="dots"></span>
+                    <span class="page-ref">14</span>
+                </a>
+            </div>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 3 : OBJET & CONTEXTE -->
+        <div class="page content-page" id="objet">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 3/14</span>
+            </div>
+            
+            <h2>1. Objet de la mission</h2>
+            
+            <p>La présente proposition porte sur une mission d'<strong>Assistance à Maîtrise d'Ouvrage (AMO)</strong> et d'<strong>Assistance à Maîtrise d'Œuvre (AMOE)</strong> visant à permettre à la Ville de Cuincy de lancer, conduire et sécuriser une consultation conforme au Code de la commande publique pour la mise en place d'un marché d'infogérance et de maintenance de son Système d'Information.</p>
+            
+            <div class="highlight-box">
+                <p><strong>L'AMO (Assistance à Maîtrise d'Ouvrage)</strong> vise à conseiller la Ville dans l'expression de ses besoins et le pilotage du projet.</p>
+                <p style="margin-bottom: 0;"><strong>L'AMOE (Assistance à Maîtrise d'Œuvre)</strong> concerne l'accompagnement technique dans la rédaction des spécifications et l'analyse des offres.</p>
+            </div>
+            
+            <h2 id="contexte" style="margin-top: 40px;">2. Contexte et enjeux</h2>
+            
+            <p>La Ville de Cuincy dispose d'un Système d'Information composé de plusieurs sites interconnectés (Mairie, services techniques, équipements culturels et sportifs). L'actuel contrat d'infogérance arrive à échéance et la collectivité souhaite :</p>
+            
+            <ul>
+                <li><strong>Réévaluer ses besoins</strong> au regard de l'évolution des usages numériques et des contraintes de cybersécurité</li>
+                <li><strong>Renforcer la sécurité</strong> de son infrastructure conformément aux recommandations de l'ANSSI et au Référentiel Général de Sécurité (RGS)</li>
+                <li><strong>Optimiser les coûts</strong> en s'appuyant sur un cahier des charges précis évitant les dérives tarifaires</li>
+                <li><strong>Garantir la continuité de service</strong> lors de la transition vers un nouveau prestataire</li>
+            </ul>
+            
+            <h3>Enjeux identifiés</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Enjeu</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Sécurité</strong></td>
+                        <td>Conformité RGS, politique de sauvegarde, protection contre les cybermenaces</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Performance</strong></td>
+                        <td>Niveaux de service (SLA) mesurables et engageants</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Maîtrise budgétaire</strong></td>
+                        <td>Bordereaux de prix unitaires clairs, limitation des avenants</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Réversibilité</strong></td>
+                        <td>Clause de transfert de compétences en fin de marché</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 4 : PÉRIMÈTRE -->
+        <div class="page content-page" id="perimetre">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 4/14</span>
+            </div>
+            
+            <h2>3. Périmètre et hypothèses de dimensionnement</h2>
+            
+            <p>Le périmètre de la mission couvre l'ensemble du Système d'Information de la Ville de Cuincy. Les hypothèses de dimensionnement suivantes serviront de base au diagnostic et seront affinées lors de la Phase 0.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Composante</th>
+                        <th>Hypothèse</th>
+                        <th>À confirmer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Postes de travail</td>
+                        <td>Environ 50 unités (fixes et portables)</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Serveurs</td>
+                        <td>Infrastructure virtualisée (estimation 3-5 serveurs physiques)</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Sites</td>
+                        <td>Mairie principale et annexes (estimation 3-4 sites)</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Équipements réseau</td>
+                        <td>Pare-feu, commutateurs, points d'accès Wi-Fi</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Applications métier</td>
+                        <td>Progiciels métiers (finances, état civil, urbanisme)</td>
+                        <td>☐</td>
+                    </tr>
+                    <tr>
+                        <td>Utilisateurs</td>
+                        <td>Environ 60-80 agents</td>
+                        <td>☐</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>Périmètre inclus</h3>
+            <ul>
+                <li>Audit complet de l'existant (technique, administratif, financier)</li>
+                <li>Rédaction du Dossier de Consultation des Entreprises (DCE)</li>
+                <li>Analyse des offres et aide à la sélection du titulaire</li>
+                <li>Accompagnement à la transition et au démarrage</li>
+            </ul>
+            
+            <h3>Périmètre exclu</h3>
+            <ul>
+                <li>Réalisation directe de prestations d'infogérance</li>
+                <li>Fourniture de matériels ou logiciels</li>
+                <li>Missions de sécurité offensive (tests d'intrusion)</li>
+                <li>Contentieux juridiques éventuels</li>
+            </ul>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 5 : DÉMARCHE (Phases 0-2) -->
+        <div class="page content-page" id="demarche">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 5/14</span>
+            </div>
+            
+            <h2>4. Démarche et livrables</h2>
+            
+            <p>La mission s'articule autour de <strong>6 phases</strong> complémentaires, garantissant une continuité de bout en bout, de l'audit initial à la mise en service opérationnelle.</p>
+            
+            <div class="phase-card">
+                <span class="phase-num">PHASE 0</span>
+                <h3 class="phase-title">Cadrage et lancement</h3>
+                <p><strong>Objectif :</strong> Valider le périmètre exact, recueillir la documentation existante et établir le calendrier détaillé de la mission.</p>
+                <p><strong>Activités :</strong></p>
+                <ul>
+                    <li>Réunion de lancement avec les parties prenantes</li>
+                    <li>Collecte documentaire (contrat actuel, schéma réseau, inventaires)</li>
+                    <li>Validation des hypothèses de dimensionnement</li>
+                    <li>Établissement du planning détaillé</li>
+                </ul>
+                <p><strong>Livrable :</strong> Note de cadrage validée</p>
+                <p><strong>Durée estimée :</strong> 2,5 jours</p>
+            </div>
+            
+            <div class="phase-card">
+                <span class="phase-num">PHASE 1</span>
+                <h3 class="phase-title">Diagnostic 360°</h3>
+                <p><strong>Objectif :</strong> Établir un état des lieux exhaustif permettant de définir les axes d'amélioration et de dimensionner précisément le futur marché.</p>
+                <p><strong>Activités :</strong></p>
+                <ul>
+                    <li>Cartographie technique et logique (inventaire complet des actifs)</li>
+                    <li>Analyse de l'architecture système et réseau</li>
+                    <li>Flash-audit de sécurité (conformité ANSSI)</li>
+                    <li>Audit du contrat actuel et analyse des écarts</li>
+                    <li>Étude des coûts (comparatif forfait/réel)</li>
+                </ul>
+                <p><strong>Livrables :</strong> Rapport de diagnostic complet, Pré-chiffrage budgétaire</p>
+                <p><strong>Durée estimée :</strong> 4 jours</p>
+            </div>
+            
+            <div class="phase-card">
+                <span class="phase-num">PHASE 2</span>
+                <h3 class="phase-title">Ingénierie de la consultation</h3>
+                <p><strong>Objectif :</strong> Rédiger un DCE sur mesure où exigences techniques et clauses administratives se renforcent mutuellement.</p>
+                <p><strong>Activités :</strong></p>
+                <ul>
+                    <li>Définition de la stratégie d'achat (forme du marché)</li>
+                    <li>Rédaction du CCTP détaillé</li>
+                    <li>Rédaction du CCAP en cohérence</li>
+                    <li>Élaboration du BPU et du cadre de réponse</li>
+                    <li>Définition des critères de notation</li>
+                </ul>
+                <p><strong>Livrables :</strong> DCE complet (CCTP, CCAP, RC, BPU, grille de notation)</p>
+                <p><strong>Durée estimée :</strong> 5 jours</p>
+            </div>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 6 : DÉMARCHE (Phases 3-5) -->
+        <div class="page content-page">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 6/14</span>
+            </div>
+            
+            <h2>4. Démarche et livrables <span style="font-size: 16px; font-weight: normal;">(suite)</span></h2>
+            
+            <div class="phase-card">
+                <span class="phase-num">PHASE 3</span>
+                <h3 class="phase-title">Pilotage de la consultation</h3>
+                <p><strong>Objectif :</strong> Accompagner la collectivité pendant toute la durée de la procédure de passation.</p>
+                <p><strong>Activités :</strong></p>
+                <ul>
+                    <li>Assistance à la publication de l'avis de marché</li>
+                    <li>Gestion des questions/réponses des candidats</li>
+                    <li>Analyse technique et financière des offres reçues</li>
+                    <li>Préparation et animation des négociations (si procédure adaptée)</li>
+                    <li>Rédaction du rapport d'analyse</li>
+                </ul>
+                <p><strong>Livrables :</strong> Tableau comparatif des offres, Rapport d'analyse justifiant le classement</p>
+                <p><strong>Durée estimée :</strong> 4 jours</p>
+            </div>
+            
+            <div class="phase-card">
+                <span class="phase-num">PHASE 4</span>
+                <h3 class="phase-title">Sélection et contractualisation</h3>
+                <p><strong>Objectif :</strong> Sécuriser juridiquement l'attribution et préparer le démarrage opérationnel.</p>
+                <p><strong>Activités :</strong></p>
+                <ul>
+                    <li>Présentation des conclusions en commission</li>
+                    <li>Assistance à la rédaction de l'acte d'engagement</li>
+                    <li>Vérification de la complétude du dossier d'attribution</li>
+                    <li>Préparation du Plan d'Assurance Qualité (PAQ)</li>
+                </ul>
+                <p><strong>Livrables :</strong> Dossier d'attribution complet, PAQ initial</p>
+                <p><strong>Durée estimée :</strong> 2 jours</p>
+            </div>
+            
+            <div class="phase-card">
+                <span class="phase-num">PHASE 5</span>
+                <h3 class="phase-title">Suivi de démarrage et tuilage</h3>
+                <p><strong>Objectif :</strong> Garantir une transition maîtrisée entre l'ancien et le nouveau prestataire.</p>
+                <p><strong>Activités :</strong></p>
+                <ul>
+                    <li>Réunion de lancement tripartite (Ville / ancien / nouveau prestataire)</li>
+                    <li>Suivi du plan de réversibilité</li>
+                    <li>Vérification du transfert de documentation</li>
+                    <li>Point d'étape à 30 jours</li>
+                </ul>
+                <p><strong>Livrables :</strong> Compte-rendu de réunion de lancement, PV de réception de la phase de transition</p>
+                <p><strong>Durée estimée :</strong> 2 jours</p>
+            </div>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 7 : CONTENU CCTP -->
+        <div class="page content-page" id="cctp">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 7/14</span>
+            </div>
+            
+            <h2>5. Contenu technique recommandé pour le CCTP</h2>
+            
+            <p>Le Cahier des Clauses Techniques Particulières sera structuré selon les axes suivants, conformément aux bonnes pratiques de la commande publique et aux recommandations de l'ANSSI :</p>
+            
+            <h3>5.1 Prestations de base</h3>
+            <ul>
+                <li>Maintenance préventive et curative du parc informatique</li>
+                <li>Supervision proactive de l'infrastructure</li>
+                <li>Gestion des incidents et support utilisateurs (niveaux 1, 2, 3)</li>
+                <li>Administration des serveurs et services réseaux</li>
+                <li>Gestion des sauvegardes et tests de restauration</li>
+            </ul>
+            
+            <h3>5.2 Sécurité et conformité</h3>
+            <ul>
+                <li>Politique de gestion des accès et des identités</li>
+                <li>Protection antivirale et anti-malware</li>
+                <li>Gestion des mises à jour de sécurité (patch management)</li>
+                <li>Plan de Reprise d'Activité (PRA) et Plan de Continuité (PCA)</li>
+                <li>Conformité au Référentiel Général de Sécurité (RGS)</li>
+            </ul>
+            
+            <h3>5.3 Engagements de service (SLA)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Niveau de criticité</th>
+                        <th>Délai de prise en charge</th>
+                        <th>Délai de résolution</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>P1 – Critique (arrêt de production)</td>
+                        <td>15 minutes</td>
+                        <td>4 heures</td>
+                    </tr>
+                    <tr>
+                        <td>P2 – Majeur (dégradation importante)</td>
+                        <td>30 minutes</td>
+                        <td>8 heures</td>
+                    </tr>
+                    <tr>
+                        <td>P3 – Mineur (gêne limitée)</td>
+                        <td>2 heures</td>
+                        <td>48 heures</td>
+                    </tr>
+                    <tr>
+                        <td>P4 – Information (demande de service)</td>
+                        <td>4 heures</td>
+                        <td>5 jours ouvrés</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>5.4 Gouvernance et reporting</h3>
+            <ul>
+                <li>Comité de pilotage mensuel</li>
+                <li>Tableau de bord des indicateurs (disponibilité, incidents, SLA)</li>
+                <li>Revue contractuelle trimestrielle</li>
+                <li>Clause de réversibilité détaillée</li>
+            </ul>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 8 : ORGANISATION -->
+        <div class="page content-page" id="organisation">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 8/14</span>
+            </div>
+            
+            <h2>6. Organisation, qualité et engagements</h2>
+            
+            <h3>6.1 Équipe projet</h3>
+            <p>La mission sera conduite par <strong>Laurent Duval</strong>, consultant principal LC2, qui assurera l'intégralité des prestations avec une continuité de bout en bout, de l'audit initial à l'accompagnement post-attribution.</p>
+            
+            <div class="highlight-box">
+                <h4 style="margin-top: 0;">Profil du consultant</h4>
+                <ul>
+                    <li>Plus de 15 ans d'expérience en infrastructures informatiques</li>
+                    <li>Expertise en marchés publics IT pour les collectivités territoriales</li>
+                    <li>Certifications : ITIL, sécurité des systèmes d'information</li>
+                    <li>Connaissance approfondie du Code de la commande publique</li>
+                </ul>
+            </div>
+            
+            <h3>6.2 Engagements qualité</h3>
+            <ul>
+                <li><strong>Indépendance :</strong> LC2 n'a aucun lien commercial avec les éditeurs ou prestataires d'infogérance susceptibles de répondre à la consultation</li>
+                <li><strong>Confidentialité :</strong> Toutes les informations recueillies sont traitées avec la plus stricte confidentialité</li>
+                <li><strong>Disponibilité :</strong> Réactivité sous 24h ouvrées pour toute sollicitation</li>
+                <li><strong>Transparence :</strong> Compte-rendu systématique après chaque réunion ou livrable</li>
+            </ul>
+            
+            <h3>6.3 Outils et méthodes</h3>
+            <ul>
+                <li>Méthodologie d'audit structurée (COBIT, ITIL)</li>
+                <li>Grilles d'analyse conformes aux pratiques de la DAJ (Direction des Affaires Juridiques)</li>
+                <li>Modèles de DCE éprouvés et adaptés aux collectivités</li>
+                <li>Outils collaboratifs sécurisés pour le partage documentaire</li>
+            </ul>
+            
+            <h3>6.4 Assurance</h3>
+            <p>LC2 Consulting dispose d'une assurance Responsabilité Civile Professionnelle couvrant l'ensemble des prestations de conseil et d'assistance à maîtrise d'ouvrage.</p>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 9 : PLANNING -->
+        <div class="page content-page" id="planning">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 9/14</span>
+            </div>
+            
+            <h2>7. Planning prévisionnel</h2>
+            
+            <p>Le planning ci-dessous est donné à titre indicatif et sera ajusté lors de la Phase 0 en fonction des contraintes de la collectivité et du calendrier de publication souhaité.</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Intitulé</th>
+                        <th>Période indicative</th>
+                        <th>Durée</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>0</strong></td>
+                        <td>Cadrage et lancement</td>
+                        <td>Semaine 1</td>
+                        <td>2,5 jours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td>Diagnostic 360°</td>
+                        <td>Semaines 2-3</td>
+                        <td>4 jours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td>Ingénierie de la consultation</td>
+                        <td>Semaines 4-5</td>
+                        <td>5 jours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td>Pilotage de la consultation</td>
+                        <td>Semaines 6-10</td>
+                        <td>4 jours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td>Sélection et contractualisation</td>
+                        <td>Semaine 11</td>
+                        <td>2 jours</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td>Suivi de démarrage et tuilage</td>
+                        <td>Semaines 12-13</td>
+                        <td>2 jours</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>TOTAL</strong></td>
+                        <td><strong>19,5 jours</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="highlight-box">
+                <h4 style="margin-top: 0;">Points d'attention</h4>
+                <ul style="margin-bottom: 0;">
+                    <li>La durée de la Phase 3 dépend du délai de réception des offres (généralement 4 à 6 semaines après publication)</li>
+                    <li>Une marge de sécurité est recommandée pour tenir compte des périodes de congés</li>
+                    <li>Le planning sera formalisé dans la note de cadrage (Phase 0)</li>
+                </ul>
+            </div>
+            
+            <h3>Jalons clés</h3>
+            <ul>
+                <li><strong>J0 :</strong> Réunion de lancement</li>
+                <li><strong>J+15 :</strong> Remise du rapport de diagnostic</li>
+                <li><strong>J+30 :</strong> Validation du DCE</li>
+                <li><strong>J+60 :</strong> Clôture de la consultation</li>
+                <li><strong>J+75 :</strong> Attribution du marché</li>
+                <li><strong>J+90 :</strong> Fin de la période de transition</li>
+            </ul>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 10 : PROPOSITION FINANCIÈRE -->
+        <div class="page content-page" id="financier">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 10/14</span>
+            </div>
+            
+            <h2>8. Proposition financière</h2>
+            
+            <p>La présente proposition est établie sur la base d'un <strong>Taux Journalier Moyen (TJM) de 850 € HT</strong>. Ce tarif inclut l'ensemble des frais (préparation, déplacements dans le secteur de Cuincy, rédaction des livrables).</p>
+            
+            <h3>8.1 Détail par phase</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Intitulé</th>
+                        <th style="text-align: center;">Jours</th>
+                        <th style="text-align: right;">Montant HT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>0</strong></td>
+                        <td>Cadrage et lancement</td>
+                        <td style="text-align: center;">2,5</td>
+                        <td style="text-align: right;">2 125 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>1</strong></td>
+                        <td>Diagnostic 360°</td>
+                        <td style="text-align: center;">4</td>
+                        <td style="text-align: right;">3 400 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2</strong></td>
+                        <td>Ingénierie de la consultation</td>
+                        <td style="text-align: center;">5</td>
+                        <td style="text-align: right;">4 250 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3</strong></td>
+                        <td>Pilotage de la consultation</td>
+                        <td style="text-align: center;">4</td>
+                        <td style="text-align: right;">3 400 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4</strong></td>
+                        <td>Sélection et contractualisation</td>
+                        <td style="text-align: center;">2</td>
+                        <td style="text-align: right;">1 700 €</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5</strong></td>
+                        <td>Suivi de démarrage et tuilage</td>
+                        <td style="text-align: center;">2</td>
+                        <td style="text-align: right;">1 700 €</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2"><strong>TOTAL</strong></td>
+                        <td style="text-align: center;"><strong>19,5</strong></td>
+                        <td style="text-align: right;"><strong>16 575 €</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>8.2 Récapitulatif</h3>
+            
+            <table>
+                <tbody>
+                    <tr>
+                        <td><strong>Total HT</strong></td>
+                        <td style="text-align: right; font-size: 18px;"><strong>16 575,00 €</strong></td>
+                    </tr>
+                    <tr>
+                        <td>TVA (20%)</td>
+                        <td style="text-align: right;">3 315,00 €</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>Total TTC</strong></td>
+                        <td style="text-align: right; font-size: 20px;"><strong>19 890,00 €</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="highlight-box">
+                <h4 style="margin-top: 0;">Modalités de facturation</h4>
+                <p style="margin-bottom: 0;"><strong>Chaque phase sera facturée individuellement après service effectué et livrables restitués.</strong> Le règlement s'effectue à 30 jours fin de mois suivant réception de la facture.</p>
+            </div>
+            
+            <p style="font-style: italic; color: var(--text-light); margin-top: 20px;">Validité de l'offre : 60 jours à compter de la date d'émission.</p>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 11 : CONDITIONS -->
+        <div class="page content-page" id="conditions">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 11/14</span>
+            </div>
+            
+            <h2>9. Conditions générales et périmètre exclus</h2>
+            
+            <h3>9.1 Conditions de réalisation</h3>
+            <ul>
+                <li>La collectivité s'engage à mettre à disposition les documents nécessaires (contrat actuel, schémas, inventaires)</li>
+                <li>Un interlocuteur référent sera désigné côté Ville de Cuincy</li>
+                <li>L'accès aux locaux techniques sera organisé selon les besoins de la mission</li>
+                <li>Les réunions pourront se tenir en présentiel ou en visioconférence selon les phases</li>
+            </ul>
+            
+            <h3>9.2 Propriété intellectuelle</h3>
+            <p>L'ensemble des livrables produits dans le cadre de cette mission deviendront la propriété exclusive de la Ville de Cuincy après paiement intégral des prestations correspondantes.</p>
+            
+            <h3>9.3 Confidentialité</h3>
+            <p>LC2 Consulting s'engage à traiter avec la plus stricte confidentialité l'ensemble des informations portées à sa connaissance dans le cadre de cette mission. Cette obligation perdure au-delà de la fin du contrat.</p>
+            
+            <h3>9.4 Périmètre exclu</h3>
+            <p>Les prestations suivantes ne sont pas incluses dans la présente offre :</p>
+            <ul>
+                <li>Réalisation directe de prestations d'infogérance ou de maintenance</li>
+                <li>Fourniture de matériels, logiciels ou licences</li>
+                <li>Tests d'intrusion ou audits de sécurité approfondis (pentests)</li>
+                <li>Accompagnement juridique en cas de contentieux</li>
+                <li>Formation des utilisateurs finaux</li>
+                <li>Interventions au-delà du périmètre géographique défini</li>
+            </ul>
+            
+            <h3>9.5 Options</h3>
+            <p>Les prestations complémentaires suivantes peuvent être proposées sur demande (tarification sur devis) :</p>
+            <ul>
+                <li>Audit de sécurité approfondi (tests d'intrusion)</li>
+                <li>Accompagnement au-delà de la période de tuilage</li>
+                <li>Formation des référents informatiques internes</li>
+                <li>Assistance aux comités de pilotage du nouveau marché</li>
+            </ul>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 12 : SIGNATURE -->
+        <div class="page content-page" id="signature">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 12/14</span>
+            </div>
+            
+            <h2>10. Acceptation et signature</h2>
+            
+            <p>La présente proposition, composée de 14 pages, constitue un engagement contractuel de LC2 Consulting envers la Ville de Cuincy pour la réalisation de la mission d'Assistance à Maîtrise d'Ouvrage décrite aux pages précédentes.</p>
+            
+            <div class="highlight-box">
+                <p style="margin: 0;"><strong>Référence :</strong> AMO-SI-CUINCY-2025-01<br>
+                <strong>Date d'émission :</strong> Janvier 2025<br>
+                <strong>Validité :</strong> 60 jours</p>
+            </div>
+            
+            <div class="signature-box">
+                <div class="signature-grid">
+                    <div class="signature-zone">
+                        <h4>Pour LC2 Consulting</h4>
+                        <p>Laurent Duval<br>Consultant Principal</p>
+                        <p style="margin-top: 40px;">Date : _______________</p>
+                        <p style="margin-top: 30px;">Signature :</p>
+                    </div>
+                    <div class="signature-zone">
+                        <h4>Pour la Ville de Cuincy</h4>
+                        <p>Nom : _______________<br>Fonction : _______________</p>
+                        <p style="margin-top: 40px;">Date : _______________</p>
+                        <p style="margin-top: 30px;">Signature et cachet :</p>
+                    </div>
+                </div>
+            </div>
+            
+            <p style="margin-top: 30px; font-style: italic; color: var(--text-light);">
+                Fait en deux exemplaires originaux.<br>
+                Chaque partie reconnaît avoir reçu un exemplaire de la présente proposition.
+            </p>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 13 : ANNEXE A -->
+        <div class="page content-page" id="annexes">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 13/14</span>
+            </div>
+            
+            <h2>Annexe A – Fiche prestataire</h2>
+            
+            <table>
+                <tbody>
+                    <tr>
+                        <td style="width: 40%; background: var(--bg-alt);"><strong>Raison sociale</strong></td>
+                        <td>LC2</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Forme juridique</strong></td>
+                        <td>Société à Responsabilité Limitée (SARL)</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Dirigeant</strong></td>
+                        <td>Laurent Duval</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Adresse</strong></td>
+                        <td>23 Rue André Messager<br>59130 Lambersart</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>SIREN</strong></td>
+                        <td>902 013 531</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>SIRET (siège)</strong></td>
+                        <td>902 013 531 00014</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Code APE</strong></td>
+                        <td>7010Z – Activités des sièges sociaux</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>N° TVA Intracommunautaire</strong></td>
+                        <td>FR 80 902 013 531</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Date de création</strong></td>
+                        <td>4 août 2021</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Téléphone</strong></td>
+                        <td>06 42 33 62 00</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Email</strong></td>
+                        <td>laurent@lc2.consulting</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Assurance RC Pro</strong></td>
+                        <td>Attestation disponible sur demande</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 style="margin-top: 40px;">Domaines d'expertise</h3>
+            <ul>
+                <li>Assistance à Maîtrise d'Ouvrage IT pour collectivités territoriales</li>
+                <li>Audit et diagnostic des Systèmes d'Information</li>
+                <li>Rédaction de cahiers des charges et DCE</li>
+                <li>Accompagnement aux marchés publics informatiques</li>
+                <li>Conseil en sécurité des systèmes d'information</li>
+                <li>Gestion de projets d'infrastructure</li>
+            </ul>
+            
+            <h3>Références</h3>
+            <p>Missions similaires réalisées pour des collectivités de la région Hauts-de-France. Liste détaillée disponible sur demande.</p>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+        <!-- PAGE 14 : ANNEXE B -->
+        <div class="page content-page" id="annexe-b">
+            <div class="page-header">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAxCAMAAACvdQotAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAEOUExURT5ubjhpaThqajdpaU97e+Do6DJlZTFkZEp3d9/n5zNmZjBjY0N2dl6RkV2QkEZ5eWmcnFCDg1GEhGaZmWSXl1yPjy9iYkt+fmKVlU2AgD1wcER3d0F0dDVoaEx/fzptbU6BgUh7e0J1dT5xcUl8fGGUlEd6ejhrazRnZzZpaTtubkV4eFaIiFWIiFSHh1uNjVqNjVmMjFiLi0p9fU+BgXirq5fKypPExIu+vluOjpnMzJ3Q0FeKimqdnYCzs4O2tnOmplKFhZPGxoG0tIa5uW+iojxvbzlsbGWYmKbZ2Yi7u2ueno2/v47Bwbbp6ZTHx1aJiU+Cgk6AgGCTk1+SkjtsbDZoaE15eeDn5////y9R3coAAAABYktHRFmasvQYAAAAB3RJTUUH6QwdCAgcSNcFVgAAAT1JREFUSMft1mtPwjAUgOGBeqqUOTrnYIPBNmAgA2HeRQRUFLxb7///l9jEAIFsoY0f5c2WfXqSNll6KkmxuEgrq2tSDIRC6xtSHBIijQlgvmBCIClv8iQrMCZYThF1cWRLwxOyTXS0OD2dQVOiIp6dG0uyJEvyvwg7JAGECCTMbM4CAQKgqITkLRFSILaTJy4WIEW1VE4TT4RUiKGpJCdA2DFva2qpGrUXFDoldpwaO5TDCfj1Rli7jboXRZxma6aAPXtBKwia+5wLq9Swbh6YyFciFzYX1g514+j45LR91uEl512917eS/sVlBvOSKzS4Ru5NdzDk/Mfw6Pbuvv3w2H96fplbWNSsxAWbDt2OW3ylJp6ZlXKKkvCobbOXsg8ldDSdyJB9e+ep7MEfbhci/RLhm9KH9SlS9ev7BzOPkktnvY8gAAAAAElFTkSuQmCC" alt="LC2" class="logo-small">
+                <span class="page-num">Page 14/14</span>
+            </div>
+            
+            <h2>Annexe B – Fiche client</h2>
+            
+            <table>
+                <tbody>
+                    <tr>
+                        <td style="width: 40%; background: var(--bg-alt);"><strong>Collectivité</strong></td>
+                        <td>Ville de Cuincy</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Adresse</strong></td>
+                        <td>Place Charles de Gaulle<br>59553 Cuincy</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Département</strong></td>
+                        <td>Nord (59)</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Région</strong></td>
+                        <td>Hauts-de-France</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>Population</strong></td>
+                        <td>Environ 6 500 habitants</td>
+                    </tr>
+                    <tr>
+                        <td style="background: var(--bg-alt);"><strong>SIRET</strong></td>
+                        <td>À compléter</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3 style="margin-top: 40px;">Interlocuteurs projet</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rôle</th>
+                        <th>Nom</th>
+                        <th>Fonction</th>
+                        <th>Contact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Sponsor</td>
+                        <td>À définir</td>
+                        <td>Élu(e) délégué(e)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Chef de projet</td>
+                        <td>À définir</td>
+                        <td>DGS / DST</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Référent technique</td>
+                        <td>À définir</td>
+                        <td>Responsable informatique</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Référent administratif</td>
+                        <td>À définir</td>
+                        <td>Service marchés</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="highlight-box" style="margin-top: 40px;">
+                <p style="margin: 0;"><strong>Note :</strong> Cette fiche sera complétée lors de la réunion de lancement (Phase 0) avec l'ensemble des coordonnées et informations nécessaires au bon déroulement de la mission.</p>
+            </div>
+            
+            <div class="page-footer">
+                <span>LC2 Consulting – Proposition AMO Cuincy</span>
+                <span>Réf. AMO-SI-CUINCY-2025-01</span>
+            </div>
+        </div>
+        
+    </div>
+    
+    <script>
+        // Barre de progression
+        function updateProgressBar() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        }
+        
+        window.addEventListener('scroll', updateProgressBar);
+        
+        // Navigation toggle
+        let navVisible = false;
+        function toggleNav() {
+            navVisible = !navVisible;
+            const nav = document.getElementById('navFloat');
+            const btn = document.getElementById('navToggle');
+            if (navVisible) {
+                nav.classList.add('visible');
+                btn.innerHTML = '✕';
+            } else {
+                nav.classList.remove('visible');
+                btn.innerHTML = '☰';
+            }
+        }
+        
+        // Smooth scroll pour les liens du sommaire
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Fermer la nav mobile
+                    if (navVisible) {
+                        toggleNav();
+                    }
+                }
+            });
+        });
+        
+        // Highlight active section in nav
+        const sections = document.querySelectorAll('.page[id]');
+        const navLinks = document.querySelectorAll('.nav-float a');
+        
+        function updateActiveNav() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        }
+        
+        window.addEventListener('scroll', updateActiveNav);
+        
+        // Animation des éléments à l'entrée dans la vue
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.phase-card, .highlight-box, table').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
