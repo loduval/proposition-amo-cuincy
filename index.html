@@ -23,11 +23,37 @@
         }
         
         @media print {
-            .page { page-break-after: always; }
-            .page:last-child { page-break-after: auto; }
+            body { 
+                font-size: 11pt; 
+                background: white;
+            }
+            .page { 
+                page-break-inside: avoid;
+                page-break-after: auto;
+                min-height: auto !important;
+                box-shadow: none;
+                margin-bottom: 0;
+            }
+            .page.cover {
+                page-break-after: always;
+            }
             .no-print { display: none !important; }
             .progress-bar { display: none !important; }
-            body { font-size: 11pt; }
+            .nav-float { display: none !important; }
+            .nav-toggle { display: none !important; }
+            .phase-card, .highlight-box, table {
+                page-break-inside: avoid;
+            }
+            h2, h3 {
+                page-break-after: avoid;
+            }
+            .page-footer {
+                position: relative;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                margin-top: 30px;
+            }
         }
         
         @page {
@@ -139,9 +165,14 @@
             background: white;
             margin-bottom: 30px;
             box-shadow: 0 2px 20px rgba(0,0,0,0.08);
-            min-height: 297mm;
             position: relative;
             overflow: hidden;
+        }
+        
+        @media screen {
+            .page {
+                min-height: 297mm;
+            }
         }
         
         /* Page de couverture */
@@ -465,16 +496,23 @@
         
         /* Footer */
         .page-footer {
-            position: absolute;
-            bottom: 30px;
-            left: 50px;
-            right: 50px;
             display: flex;
             justify-content: space-between;
             font-size: 11px;
             color: var(--text-light);
             border-top: 1px solid var(--border);
             padding-top: 15px;
+            margin-top: 30px;
+        }
+        
+        @media screen {
+            .page-footer {
+                position: absolute;
+                bottom: 30px;
+                left: 50px;
+                right: 50px;
+                margin-top: 0;
+            }
         }
         
         /* Animations d'entrée */
@@ -1239,13 +1277,41 @@
             </ul>
             
             <h3>9.5 Options</h3>
-            <p>Les prestations complémentaires suivantes peuvent être proposées sur demande (tarification sur devis) :</p>
-            <ul>
-                <li>Audit de sécurité approfondi (tests d'intrusion)</li>
-                <li>Accompagnement au-delà de la période de tuilage</li>
-                <li>Formation des référents informatiques internes</li>
-                <li>Assistance aux comités de pilotage du nouveau marché</li>
-            </ul>
+            <p>Les prestations complémentaires suivantes peuvent être commandées en sus de la mission principale, au tarif journalier de 850 € HT :</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th style="text-align: center;">Durée</th>
+                        <th style="text-align: right;">Montant HT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Audit de sécurité approfondi (tests d'intrusion)</td>
+                        <td style="text-align: center;">3 jours</td>
+                        <td style="text-align: right;">2 550 €</td>
+                    </tr>
+                    <tr>
+                        <td>Accompagnement au-delà de la période de tuilage</td>
+                        <td style="text-align: center;">1 jour</td>
+                        <td style="text-align: right;">850 €</td>
+                    </tr>
+                    <tr>
+                        <td>Formation des référents informatiques internes</td>
+                        <td style="text-align: center;">1,5 jour</td>
+                        <td style="text-align: right;">1 275 €</td>
+                    </tr>
+                    <tr>
+                        <td>Assistance aux comités de pilotage du nouveau marché</td>
+                        <td style="text-align: center;">0,5 jour / comité</td>
+                        <td style="text-align: right;">425 € / comité</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p style="font-style: italic; color: var(--text-light); margin-top: 15px;">Ces options peuvent être activées à tout moment sur simple commande. Facturation après service effectué.</p>
             
             <div class="page-footer">
                 <span>LC2 Consulting – Proposition AMO Cuincy</span>
@@ -1351,7 +1417,7 @@
                     </tr>
                     <tr>
                         <td style="background: var(--bg-alt);"><strong>Email</strong></td>
-                        <td>laurent@lc2.consulting</td>
+                        <td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="84e8e5f1f6e1eaf0c4e8e7b6aae7ebeaf7f1e8f0edeae3">[email&#160;protected]</a></td>
                     </tr>
                     <tr>
                         <td style="background: var(--bg-alt);"><strong>Assurance RC Pro</strong></td>
@@ -1468,7 +1534,7 @@
         
     </div>
     
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         // Barre de progression
         function updateProgressBar() {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
@@ -1540,13 +1606,4 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('animate-in');
-                }
-            });
-        }, { threshold: 0.1 });
-        
-        document.querySelectorAll('.phase-card, .highlight-box, table').forEach(el => {
-            observer.observe(el);
-        });
-    </script>
-</body>
-</html>
+      
